@@ -151,3 +151,15 @@ delete_matrix(int M, byte **matrix)
         free(matrix[i]);
     free(matrix);
 }
+
+void
+display_matrix(int M, int Q, byte **m)
+{
+    int     i, j;
+    for (i = 0; i < M; ++i) {
+        for (j = 0; j < Q; ++j) {
+            printf("%2d", m[i][j]);
+        }
+        printf("\n");
+    }
+}
