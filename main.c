@@ -10,19 +10,27 @@
 #define IVLEN   8
 #define IVLEN_BIT (IVLEN * 8)
 
+double linear_span_test(uint8_t key[], int m, int N);
+
 int main() {
 
     srand(time(NULL));
 
-    int m = 5;
+    uint8_t key[KEYLEN] = {0};
+    int m = 5, N = 100;
+
+    linear_span_test(key, m, N);
+
+    return 0;
+}
+
+double linear_span_test(uint8_t key[], int m, int N) {
+
     int _2m = (1u << m);
-    int N = 100;
     int R[N];
 
     int num_fullrank = 0, num_onelessfullrank = 0, num_lowrank = 0;
     float prob_fullrank, prob_onelessfullrank, prob_lowrank;
-
-    uint8_t key[KEYLEN] = {0};
 
     int i;
     for (i = 0; i < N; ++i) {
@@ -58,7 +66,7 @@ int main() {
             }
         }
 
-        // generate keystream for each generated IV
+        // get keystream for each generated IV
         byte **Z = malloc(_2m * sizeof(byte *));
         byte *IV_byte;
         uint8_t *keystream_byte;
@@ -78,15 +86,15 @@ int main() {
             free(keystream_byte);
         }
 
+        // calculate rank of M (or Z)
+        R[i] = computeRank(_2m, _2m, Z);
+
         //    printf("Alpha: \n");
         //    display_matrix(m, IVLEN_BIT, alpha);
         //    printf("IV: \n");
         //    display_matrix(_2m, IVLEN_BIT, IV);
         //    printf("M: \n");
         //    display_matrix(_2m, _2m, Z);
-
-        // calculate rank of M (or Z)
-        R[i] = computeRank(_2m, _2m, Z);
         //    printf("R[%d] = %d\n", i, R[i]);
 
         delete_matrix(m, alpha);
@@ -115,19 +123,7 @@ int main() {
     printf("chisq = %lf\n", chisq);
     printf("p-val = %lf\n", pval);
 
-    return 0;
+    return pval;
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
