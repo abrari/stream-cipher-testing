@@ -67,3 +67,15 @@ void xor_bytes(/*IN*/ byte *b1, /*IN*/ byte *b2, /*OUT*/ byte *result, unsigned 
         result[i] = b1[i] ^ b2[i];
     }
 }
+
+unsigned int isset_bit(byte *b, int pos) {
+    return (b[pos/8] & (128 >> (pos%8)));
+}
+
+void set_bit(byte *b, int pos) {
+    b[pos/8] |= (128 >> (pos%8));
+}
+
+void unset_bit(byte *b, int pos) {
+    b[pos/8] &= 255 - two_power(7 - (pos%8));
+}
