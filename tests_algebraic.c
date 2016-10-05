@@ -94,17 +94,17 @@ double linear_span_test(uint8_t key[], int m, int N) {
     prob_onelessfullrank = (float) num_onelessfullrank / N;
     prob_lowrank = (float) num_lowrank / N;
 
-    printf("R  = m   : %2d (%.5f)\n", num_fullrank, prob_fullrank);
-    printf("R  = m-1 : %2d (%.5f)\n", num_onelessfullrank, prob_onelessfullrank);
-    printf("R <= m-2 : %2d (%.5f)\n", num_lowrank, prob_lowrank);
+    // printf("R  = m   : %2d (%.5f)\n", num_fullrank, prob_fullrank);
+    // printf("R  = m-1 : %2d (%.5f)\n", num_onelessfullrank, prob_onelessfullrank);
+    // printf("R <= m-2 : %2d (%.5f)\n", num_lowrank, prob_lowrank);
 
     double chisq = pow((double) num_fullrank - 0.2888 * N, 2) / (0.2888 * N) \
                  + pow((double) num_onelessfullrank - 0.5776 * N, 2) / (0.5776 * N) \
                  + pow((double) num_lowrank - 0.1336 * N, 2) / (0.1336 * N);
     double pval  = exp(-chisq / 2);
 
-    printf("chisq = %lf\n", chisq);
-    printf("p-val = %lf\n", pval);
+    // printf("chisq = %lf\n", chisq);
+    // printf("p-val = %lf\n", pval);
 
     return pval;
 
