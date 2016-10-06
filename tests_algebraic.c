@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #include "matrix.h"
 #include "bytes.h"
+#include "stats.h"
 #include "salsa20/salsa20.h"
 
-#include "tests_algebraic.h"
-#include "tests_randommapping.h"
+#define KEYLEN      16
+#define KEYLEN_BIT  (KEYLEN * 8)
+#define IVLEN       8
+#define IVLEN_BIT   (IVLEN * 8)
 
 double linear_span_test(uint8_t key[], int m, int N) {
 

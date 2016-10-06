@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 #include "bytes.h"
+#include "stats.h"
 #include "salsa20/salsa20.h"
-#include "tests_randommapping.h"
 
 #define KEYLEN  16
 #define IVLEN   8
