@@ -97,3 +97,15 @@ unsigned int hamming_weight(byte *b, unsigned int length) {
     }
     return w;
 }
+
+void inc_byte(byte *b, int idx) { // idx = bytelength-1 (last index)
+    if (b[idx] < 0xff) {
+        b[idx]++;
+        return;
+    }
+    b[idx] = 0x00;
+    if (idx == 0)
+        return;
+    idx--;
+    inc_byte(b, idx);
+}
