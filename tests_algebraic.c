@@ -6,6 +6,7 @@
 #include "salsa20/salsa20.h"
 
 #include "tests_algebraic.h"
+#include "tests_randommapping.h"
 
 double linear_span_test(uint8_t key[], int m, int N) {
 
@@ -110,3 +111,84 @@ double linear_span_test(uint8_t key[], int m, int N) {
 
 }
 
+double diffusion_test(int N, int L) {
+    float e_prob[5] = {0.199405, 0.189855, 0.221481, 0.189855, 0.199405};
+    int bin[5] = {498, 507, 516, 525, 1024}, LB = L>>3;
+    float e_freq[5], o_freq[5] = {0};
+
+    if (N != 1024) return -1;
+
+    unsigned i, j, m;
+
+    for (i = 0; i < 5; i++)
+        e_freq[i] = e_prob[i] * ((KEYLEN_BIT+IVLEN_BIT)*L);
+
+    byte *key, *iv, *keystream1, *keystream2;
+    int **M;
+    byte *diff_bits = calloc(L, sizeof(uint8_t));
+
+    M = create_integer_matrix(KEYLEN_BIT+IVLEN_BIT, L);
+
+    for(i=0; i<N; i++) {
+        key = generate_random_bytes(KEYLEN);
+        iv = generate_random_bytes(IVLEN);
+
+        uint8_t *keystream1 = calloc(LB, sizeof(uint8_t));
+        s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream1, LB);
+
+        for(j=0; j<(KEYLEN_BIT+IVLEN_BIT); j++) {
+
+            // flip the current bit;
+            if (j<KEYLEN_BIT) {
+                flip_bit(key, j);
+            }
+            else {
+                flip_bit(iv, j-KEYLEN_BIT);
+            }
+
+            uint8_t *keystream2 = calloc(LB, sizeof(uint8_t));
+            s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream2, LB);
+
+            uint8_t *diff = calloc(LB, sizeof(uint8_t));
+            xor_bytes(keystream1, keystream2, diff, LB);
+
+            byte_to_bit_array(diff, LB, diff_bits);
+
+            for(m=0; m<L; m++) {
+                M[j][m] += diff_bits[m];
+            }
+
+            // flip the bit to restore its original value;
+            if (j<KEYLEN_BIT) {
+                flip_bit(key, j);
+            }
+            else {
+                flip_bit(iv, j-KEYLEN_BIT);
+            }
+
+            free(diff);
+            free(keystream2);
+        }
+
+        free(keystream1);
+        free(iv);
+        free(key);
+
+    }
+
+    for(i=0; i<(KEYLEN_BIT+IVLEN_BIT); i++) {
+        for(j=0; j<L; j++) {
+            m = 0;
+            while (M[i][j] > bin[m])
+                m++;
+            o_freq[m]++;
+
+        }
+
+    }
+
+    for (i = 0; i < 5; i++)
+        printf("%d\t%f\t%f\n", i, e_freq[i], o_freq[i]);
+
+    return chisqr(4, chi_sq(5, o_freq, e_freq));
+}

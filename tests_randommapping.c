@@ -114,7 +114,8 @@ double chisqr(int Dof, double Cv) {
 }
 
 double rho_test(uint8_t *key, int r, int l) {
-    float e_prob[5], e_freq[5], bin[5], o_freq[5] = {0};
+    float e_prob[5], e_freq[5], o_freq[5] = {0};
+    int bin[5];
     int i, j, k, mask, temp;
 
     switch (l) {
@@ -216,7 +217,8 @@ double rho_test(uint8_t *key, int r, int l) {
 }
 
 double coverage_test(uint8_t *key, int r, int l) {
-    float e_prob[5], e_freq[5], bin[5], o_freq[5] = {0};
+    float e_prob[5], e_freq[5], o_freq[5] = {0};
+    int bin[5];
     int i, j, k, mask, temp;
 
     switch (l) {
@@ -319,7 +321,8 @@ double coverage_test(uint8_t *key, int r, int l) {
 }
 
 double dpcoverage_test(uint8_t *key, int r, int l, int k) {
-    float e_prob[5], e_freq[5], bin[5], o_freq[5] = {0};
+    float e_prob[5], e_freq[5], o_freq[5] = {0};
+    int bin[5];
     int i, j, m, mask, temp;
 
     switch (l) {
@@ -371,7 +374,7 @@ double dpcoverage_test(uint8_t *key, int r, int l, int k) {
     //printf("\n");
 
     for (i = 0; i < r; i++) {
-        printf("RUN #%d\n", i);
+        //printf("RUN #%d\n", i);
         int *cov = calloc(two_power(l), sizeof(int));
         int cov_freq = 0;
 
@@ -387,10 +390,6 @@ double dpcoverage_test(uint8_t *key, int r, int l, int k) {
                 mask >>= 1;
             }
 
-            //print_bytes(iv, IVLEN);
-            //printf("\n");
-            //getch();
-
             uint32_t keystreamlen = 1000, prevkeystreamlen = 0;
             uint8_t *keystream = NULL;
             unsigned int startlpos, numfound = 0;
@@ -402,6 +401,8 @@ double dpcoverage_test(uint8_t *key, int r, int l, int k) {
                 startlpos = find_kzeroes(k, keystream, keystreamlen, &numfound);
                 prevkeystreamlen += keystreamlen;
             } while (!startlpos);
+
+            // Belum menangani kasus sisa bit di keystream kurang dari l
 
             unsigned int p, q;
             p = startlpos / 8;
@@ -432,8 +433,8 @@ double dpcoverage_test(uint8_t *key, int r, int l, int k) {
         free(cov);
     }
 
-    for (i = 0; i < 5; i++)
-        printf("%d\t%f\t%f\n", i, e_freq[i], (float) o_freq[i]);
+//    for (i = 0; i < 5; i++)
+//        printf("%d\t%f\t%f\n", i, e_freq[i], (float) o_freq[i]);
 
     free(lpos);
 

@@ -60,7 +60,7 @@ perform_elementary_row_operations(int flag, int i, int M, int Q, byte **A)
 
 int
 find_unit_element_and_swap(int flag, int i, int M, int Q, byte **A)
-{ 
+{
     int		index, row_op=0;
 
     if ( flag == MATRIX_FORWARD_ELIMINATION ) {
@@ -142,6 +142,30 @@ create_matrix(int M, int Q)
     }
 }
 
+int**
+create_integer_matrix(int M, int Q)
+{
+    int	    i;
+    int     **matrix;
+
+    if ( (matrix = malloc(M * sizeof(int *))) == NULL ) {
+        printf("ERROR IN FUNCTION create_matrix:  Insufficient memory available.\n");
+
+        return NULL;
+    }
+    else {
+        for ( i=0; i<M; i++ ) {
+            if ( (matrix[i] = calloc(Q, sizeof(int))) == NULL ) {
+                printf("ERROR IN FUNCTION create_matrix: Insufficient memory for %dx%d matrix.\n", M, M);
+
+                return NULL;
+            }
+        }
+        return matrix;
+    }
+}
+
+
 void
 delete_matrix(int M, byte **matrix)
 {
@@ -158,7 +182,19 @@ display_matrix(int M, int Q, byte **m)
     int     i, j;
     for (i = 0; i < M; ++i) {
         for (j = 0; j < Q; ++j) {
-            printf("%2d", m[i][j]);
+            printf("%5d", m[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void
+display_int_matrix(int M, int Q, int **m)
+{
+    int     i, j;
+    for (i = 0; i < M; ++i) {
+        for (j = 0; j < Q; ++j) {
+            printf("%5d", m[i][j]);
         }
         printf("\n");
     }

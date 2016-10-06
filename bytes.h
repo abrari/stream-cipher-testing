@@ -12,6 +12,7 @@ byte * generate_random_bytes(unsigned int length);
 byte * generate_random_bits(unsigned int bitlength);
 void xor_bytes(/*IN*/ byte *b1, /*IN*/ byte *b2, /*OUT*/ byte *result, unsigned int length);
 unsigned int isset_bit(byte *b, int pos);
+void flip_bit(byte *b, int pos);
 void set_bit(byte *b, int pos);
 void unset_bit(byte *b, int pos);
 

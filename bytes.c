@@ -79,3 +79,7 @@ void set_bit(byte *b, int pos) {
 void unset_bit(byte *b, int pos) {
     b[pos/8] &= 255 - two_power(7 - (pos%8));
 }
+
+void flip_bit(byte *b, int pos) {
+    b[pos/8] ^= (128 >> (pos%8));
+}
