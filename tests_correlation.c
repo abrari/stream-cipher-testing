@@ -5,9 +5,12 @@
 #include "bytes.h"
 #include "stats.h"
 #include "salsa20/salsa20.h"
+#include "matrix.h"
 
-#define KEYLEN  16
-#define IVLEN   8
+#define KEYLEN      16
+#define KEYLEN_BIT  (KEYLEN * 8)
+#define IVLEN       8
+#define IVLEN_BIT   (IVLEN * 8)
 
 double key_keystream_correlation_test(uint8_t *IV, int m) {
 
@@ -143,3 +146,52 @@ double iv_keystream_correlation_test(uint8_t *key, int m) {
     return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 
 }
+
+double frame_correlation_test(unsigned int l, unsigned int m) {   // l is in bits
+
+    uint8_t *key = generate_random_bytes(KEYLEN);
+    uint8_t *iv  = generate_random_bytes(IVLEN);
+
+    unsigned int *w = calloc(l, sizeof(unsigned int));
+
+    int i, j;
+    for (i = 0; i < m; ++i) {
+        uint32_t keystreamlen = l / 8;
+
+        uint8_t *keystream = calloc(keystreamlen, sizeof(uint8_t));
+        uint8_t *keystream_bit = malloc(l);
+
+        s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream, keystreamlen);
+        byte_to_bit_array(keystream, keystreamlen, keystream_bit);
+
+        for (j = 0; j < l; ++j) {
+            w[j] += keystream_bit[j];
+        }
+
+        // print_bytes(iv, IVLEN); printf("\n");
+        // print_bytes(keystream, keystreamlen); printf("\n");
+
+        inc_byte(iv, IVLEN-1);
+        free(keystream);
+        free(keystream_bit);
+    }
+
+    for (j = 0; j < l; ++j) {
+        printf("%d ", w[j]);
+    }
+
+    free(key);
+    free(iv);
+
+    return 0;
+
+}
+
+
+
+
+
+
+
+
+

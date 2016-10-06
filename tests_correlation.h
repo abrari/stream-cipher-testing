@@ -5,5 +5,6 @@
 
 double key_keystream_correlation_test(uint8_t *IV, int m);
 double iv_keystream_correlation_test(uint8_t *key, int m);
+double frame_correlation_test(unsigned int l, unsigned int m);
 
 #endif //STREAM_CIPHER_TESTS_CORRELATION_H
