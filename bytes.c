@@ -83,3 +83,17 @@ void unset_bit(byte *b, int pos) {
 void flip_bit(byte *b, int pos) {
     b[pos/8] ^= (128 >> (pos%8));
 }
+
+unsigned int hamming_weight(byte *b, unsigned int length) {
+    unsigned int w = 0;
+    unsigned int i, x;
+    for (i = 0; i < length; ++i) {
+        // http://stackoverflow.com/a/14010273/1198623
+        x = b[i];
+        x = (x & 0x55) + (x >> 1 & 0x55);
+        x = (x & 0x33) + (x >> 2 & 0x33);
+        x = (x & 0x0f) + (x >> 4 & 0x0f);
+        w += x;
+    }
+    return w;
+}

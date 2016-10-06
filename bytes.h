@@ -15,5 +15,6 @@ unsigned int isset_bit(byte *b, int pos);
 void flip_bit(byte *b, int pos);
 void set_bit(byte *b, int pos);
 void unset_bit(byte *b, int pos);
+unsigned int hamming_weight(byte *b, unsigned int length);
 
 #endif //STREAM_CIPHER_BYTES_H
