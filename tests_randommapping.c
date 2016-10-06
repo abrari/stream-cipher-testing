@@ -160,7 +160,7 @@ double rho_test(uint8_t *key, int r, int l) {
 
     free(lpos);
 
-    return chisqr(4, chi_sq(5, o_freq, e_freq));
+    return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 }
 
 double coverage_test(uint8_t *key, int r, int l) {
@@ -264,7 +264,7 @@ double coverage_test(uint8_t *key, int r, int l) {
 
     free(lpos);
 
-    return chisqr(4, chi_sq(5, o_freq, e_freq));
+    return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 }
 
 double dpcoverage_test(uint8_t *key, int r, int l, int k) {
@@ -385,5 +385,5 @@ double dpcoverage_test(uint8_t *key, int r, int l, int k) {
 
     free(lpos);
 
-    return chisqr(4, chi_sq(5, o_freq, e_freq));
+    return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 }

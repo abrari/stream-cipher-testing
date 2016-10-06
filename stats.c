@@ -33,7 +33,7 @@ static double igf(double S, double Z) {
     return Sum * Sc;
 }
 
-double chisqr(int Dof, double Cv) {
+double chi_sq_pval(int Dof, double Cv) {
     if (Cv < 0 || Dof < 1) {
         return 0.0;
     }

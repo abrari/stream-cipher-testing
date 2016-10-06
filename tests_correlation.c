@@ -67,7 +67,7 @@ double key_keystream_correlation_test(uint8_t *IV, int m) {
     // for (i = 0; i < 5; i++)
     //    printf("%d\t%f\t%f\n", i, e_freq[i], o_freq[i]);
 
-    return chisqr(4, chi_sq(5, o_freq, e_freq));
+    return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 
 }
 
@@ -140,6 +140,6 @@ double iv_keystream_correlation_test(uint8_t *key, int m) {
     // for (i = 0; i < 5; i++)
     //    printf("%d\t%f\t%f\n", i, e_freq[i], o_freq[i]);
 
-    return chisqr(4, chi_sq(5, o_freq, e_freq));
+    return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 
 }
