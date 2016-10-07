@@ -58,7 +58,7 @@ double normal_cdf(double x, double mean, double stdev) {
     return 0.5 * erfc(-(x - mean) / (stdev * sqrt(2)));
 }
 
-void calculate_bins(int m, /*OUT*/ int *bin, /*OUT*/ double *e_prob) {
+void calculate_bins(int m, /*OUT*/ int *bin, /*OUT*/ float *e_prob) {
 
     const float threshold = 0.001;
     const int bins = 5;
@@ -89,10 +89,14 @@ void calculate_bins(int m, /*OUT*/ int *bin, /*OUT*/ double *e_prob) {
     bin[bins-1] = m; // last bin = m
 
     // calculate expected probabilities
-    e_prob[0] = normal_cdf(bin[0], mean, stdev) - normal_cdf(0, mean, stdev); // first bin prob
+    e_prob[0] = (float)(normal_cdf(bin[0], mean, stdev) - normal_cdf(0, mean, stdev)); // first bin prob
     for (i = 1; i < bins; ++i) {
-        e_prob[i] = normal_cdf(bin[i], mean, stdev) - normal_cdf(bin[i-1] + 1, mean, stdev);
+        e_prob[i] = (float)(normal_cdf(bin[i], mean, stdev) - normal_cdf(bin[i-1] + 1, mean, stdev));
     }
+
+    // for (i = 0; i < bins; ++i) {
+    //     printf("%d\t%d\t%f\n", i, bin[i], e_prob[i]);
+    // }
 
 }
 

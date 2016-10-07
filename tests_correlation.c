@@ -5,7 +5,6 @@
 #include "bytes.h"
 #include "stats.h"
 #include "salsa20/salsa20.h"
-#include "matrix.h"
 
 #define KEYLEN      16
 #define KEYLEN_BIT  (KEYLEN * 8)
@@ -154,7 +153,7 @@ double frame_correlation_test(unsigned int l, unsigned int m) {   // l is in bit
 
     unsigned int *w = calloc(l, sizeof(unsigned int));
 
-    int i, j;
+    int i, j, k;
     for (i = 0; i < m; ++i) {
         uint32_t keystreamlen = l / 8;
 
@@ -176,14 +175,26 @@ double frame_correlation_test(unsigned int l, unsigned int m) {   // l is in bit
         free(keystream_bit);
     }
 
+    // chi-square testing of w
+
+    float e_prob[5], e_freq[5], o_freq[5] = {0};
+    int bin[5];
+
+    calculate_bins(m, bin, e_prob);
+    for (i = 0; i < 5; i++)
+        e_freq[i] = e_prob[i] * l;
+
     for (j = 0; j < l; ++j) {
-        printf("%d ", w[j]);
+        k = 0;
+        while (w[j] > bin[k])
+            k++;
+        o_freq[k]++;
     }
 
     free(key);
     free(iv);
 
-    return 0;
+    return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 
 }
 
