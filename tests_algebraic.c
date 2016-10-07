@@ -12,7 +12,7 @@
 #define IVLEN       8
 #define IVLEN_BIT   (IVLEN * 8)
 
-double linear_span_test(uint8_t key[], int m, int N) {
+double linear_span_test(uint8_t key[], int N, int m) {
 
     unsigned int _2m = (1u << m);
     unsigned int R[N];
