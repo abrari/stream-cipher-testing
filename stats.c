@@ -60,35 +60,23 @@ double normal_cdf(double x, double mean, double stdev) {
 
 void calculate_bins(int m, /*OUT*/ int *bin, /*OUT*/ float *e_prob) {
 
-    const float threshold = 0.001;
-    const int bins = 5;
-
-    // find leftmost from center
+    int i = 0, x = 0, bins = 5;
     int mean = m/2;
     int variance = m/4;
     double stdev = sqrt(variance);
-    int x = mean;
-    double prob;
+
+    float prob;
+
     do {
-        prob = normal_cdf(x, mean, stdev);
-        // printf("%d\t%f\n", x, prob);
-        x--;
-    } while(prob >= threshold);
-    x++;
+        prob = (float)normal_cdf(x, mean, stdev);
+        if (prob >= 0.2 * (i+1)) {
+            bin[i] = x;
+            i++;
+        }
+        x++;
+    } while(i < bins-1);
+    bin[bins-1] = m;
 
-    // calculate left and right
-    int left, right, binwidth, i;
-    left = x;
-    right = mean + (mean - x);
-    binwidth = (right - left) / bins;
-
-    // calculate bin boundaries
-    for (i = 0; i < bins-1; ++i) {
-        bin[i] = left + binwidth * (i + 1);
-    }
-    bin[bins-1] = m; // last bin = m
-
-    // calculate expected probabilities
     e_prob[0] = (float)(normal_cdf(bin[0], mean, stdev) - normal_cdf(0, mean, stdev)); // first bin prob
     for (i = 1; i < bins; ++i) {
         e_prob[i] = (float)(normal_cdf(bin[i], mean, stdev) - normal_cdf(bin[i-1] + 1, mean, stdev));
