@@ -191,8 +191,8 @@ double diffusion_test(int N, int L) {
 
     }
 
-    for (i = 0; i < 5; i++)
-        printf("%d\t%f\t%f\n", i, e_freq[i], o_freq[i]);
+    // for (i = 0; i < 5; i++)
+    //    printf("%d\t%f\t%f\n", i, e_freq[i], o_freq[i]);
 
     return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 }
