@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdio.h>
 
 double chi_sq(int n, float observed[], float expected[]) {
     double cs = 0;
@@ -52,4 +53,54 @@ double chi_sq_pval(int Dof, double Cv) {
 
     return (1.0 - PValue);
 }
+
+double normal_cdf(double x, double mean, double stdev) {
+    return 0.5 * erfc(-(x - mean) / (stdev * sqrt(2)));
+}
+
+void calculate_bins(int m, /*OUT*/ int *bin, /*OUT*/ double *e_prob) {
+
+    const float threshold = 0.001;
+    const int bins = 5;
+
+    // find leftmost from center
+    int mean = m/2;
+    int variance = m/4;
+    double stdev = sqrt(variance);
+    int x = mean;
+    double prob;
+    do {
+        prob = normal_cdf(x, mean, stdev);
+        // printf("%d\t%f\n", x, prob);
+        x--;
+    } while(prob >= threshold);
+    x++;
+
+    // calculate left and right
+    int left, right, binwidth, i;
+    left = x;
+    right = mean + (mean - x);
+    binwidth = (right - left) / bins;
+
+    // calculate bin boundaries
+    for (i = 0; i < bins-1; ++i) {
+        bin[i] = left + binwidth * (i + 1);
+    }
+    bin[bins-1] = m; // last bin = m
+
+    // calculate expected probabilities
+    e_prob[0] = normal_cdf(bin[0], mean, stdev) - normal_cdf(0, mean, stdev); // first bin prob
+    for (i = 1; i < bins; ++i) {
+        e_prob[i] = normal_cdf(bin[i], mean, stdev) - normal_cdf(bin[i-1] + 1, mean, stdev);
+    }
+
+}
+
+
+
+
+
+
+
+
 
