@@ -7,6 +7,8 @@
 #include "tests_randommapping.h"
 #include "tests_correlation.h"
 
+#include "stats.h"
+
 #define KEYLEN      16
 #define IVLEN       8
 
@@ -32,8 +34,9 @@ int main() {
         p_vals[i] = coverage_test(key, N, 12);
         sum_p_vals += p_vals[i];
     }
-    printf("\n\taverage p-value = %f\n", sum_p_vals / num_p_vals);
-
+    printf("\n\taverage p-value = %f", sum_p_vals / num_p_vals);
+    printf("\n\tks test         = %f\n", KStest(p_vals, num_p_vals));
+/*
     printf("Rho test\n\t");
     sum_p_vals = 0.0;
     for (i = 0; i < num_p_vals; ++i) {
@@ -96,6 +99,6 @@ int main() {
         sum_p_vals += p_vals[i];
     }
     printf("\n\taverage p-value = %f\n", sum_p_vals / num_p_vals);
-
+*/
     return 0;
 }
