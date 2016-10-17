@@ -7,6 +7,7 @@
 #include "tests_randommapping.h"
 #include "tests_correlation.h"
 
+#include "bytes.h"
 #include "stats.h"
 
 #define KEYLEN      16
@@ -14,24 +15,29 @@
 
 #define two_power(n) (1u << (n))
 
+#include "sfmt/SFMT.h"
+
+sfmt_t mtrand;
+
 int main() {
 
-    srand(time(NULL));
+    sfmt_init_gen_rand(&mtrand, 7);
+
     setvbuf(stdout, NULL, _IONBF, 0);
 
     const int num_p_vals = 100;
     const int N = 100;
-    int i, j;
+    int i;
     double p_vals[num_p_vals], sum_p_vals;
 
-    uint8_t key[KEYLEN] = {'C', 'O', 'M', 'P', 'U', 'T', 'E', 'R', ' ', 'S', 'C', 'I', 'E', 'N', 'C', 'E'};
+    uint8_t *key = generate_random_bytes(KEYLEN);
     uint8_t iv[IVLEN]   = {'C', 'O', 'M', 'P', 'U', 'T', 'E', 'R'};
 
-    printf("Coverage test\n\t");
+    printf("Coverage test\n");
     sum_p_vals = 0.0;
     for (i = 0; i < num_p_vals; ++i) {
-        if (i % 10 == 0) printf("%d%% ", i);
         p_vals[i] = coverage_test(key, N, 12);
+        printf("p-val %d = %f\n", i, p_vals[i]);
         sum_p_vals += p_vals[i];
     }
     printf("\n\taverage p-value = %f", sum_p_vals / num_p_vals);

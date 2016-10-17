@@ -42,10 +42,16 @@ void bit_to_byte_array(/*IN*/ byte *bits, unsigned int bitslength, /*OUT*/ byte 
 }
 
 byte *generate_random_bytes(unsigned int length) {
+    assert(length % 4 == 0);
+
     byte *bytes = malloc(length);
     unsigned int i;
-    for (i = 0; i < length; ++i) {
-        bytes[i] = rand() % 256;
+    for (i = 0; i < length; i += 4) {
+        uint32_t r = sfmt_genrand_uint32(&mtrand);
+        bytes[i]   = (r >> 24);
+        bytes[i+1] = (r >> 16) & 0xff;
+        bytes[i+2] = (r >> 8)  & 0xff;
+        bytes[i+3] = r  & 0xff;
     }
     return bytes;
 }
@@ -106,6 +112,6 @@ void inc_byte(byte *b, int idx) { // idx = bytelength-1 (last index)
     b[idx] = 0x00;
     if (idx == 0)
         return;
-    idx--;
-    inc_byte(b, idx);
+    //idx--;
+    inc_byte(b, idx - 1);
 }

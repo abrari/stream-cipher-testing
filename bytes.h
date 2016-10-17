@@ -1,6 +1,10 @@
 #ifndef STREAM_CIPHER_BYTES_H
 #define STREAM_CIPHER_BYTES_H
 
+#include "sfmt/SFMT.h"
+
+extern sfmt_t mtrand;
+
 typedef unsigned char byte;
 #define two_power(n)    (1u << (n))
 
