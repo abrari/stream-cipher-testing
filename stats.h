@@ -11,5 +11,7 @@ double chi_sq_pval(int Dof, double Cv);
 double normal_cdf(double x, double mean, double stdev);
 void calculate_bins(int m, /*OUT*/ int *bin, /*OUT*/ float *e_prob);
 real KStest(real *x, int dim);
+double chi_sq_uniform(double *vals, unsigned int n, unsigned int b);
+double prop_under_alpha(double *vals, unsigned int n, double alpha);
 
 #endif //STREAM_CIPHER_STATS_H

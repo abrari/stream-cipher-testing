@@ -159,6 +159,39 @@ real KStest(real *x, int dim) {
 }
 
 
+double chi_sq_uniform(double *vals, unsigned int n, unsigned int b) {
+    //double *bin = malloc(sizeof(double)*b);
+    unsigned int i, k, *o_freq = (unsigned int*) calloc(sizeof(unsigned int), b);
+    double divisor = 1.0/b, e_freq = n * divisor;
+//    bin[b-1] = 1.0;
+//    for(i=b-1; i; i--)
+//        bin[i] = b[i+1] - 1.0/b;
+
+    for(i=0; i<n; i++) {
+        k = (int)(vals[i]/divisor);
+        o_freq[k]++;
+    }
+
+    double cs = 0.0;
+    for(i=0; i<b; i++) {
+        cs += ((double) o_freq[i] - e_freq) * ((double) o_freq[i] - e_freq);
+    }
+    cs /= e_freq;
+
+    //printf("cs = %f\n", cs);
+
+    return (chi_sq_pval(b-1, cs));
+}
+
+double prop_under_alpha(double *vals, unsigned int n, double alpha) {
+    unsigned int i, freq=0;
+
+    for(i=0; i<n; i++)
+        if (vals[i]<=alpha) freq++;
+
+    return (freq/(double)n);
+}
+
 
 
 
