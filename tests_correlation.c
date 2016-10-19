@@ -146,14 +146,39 @@ double iv_keystream_correlation_test(uint8_t *key, int m) {
 
 }
 
+// http://pastebin.com/PWdxg6ky
+
 double frame_correlation_test(unsigned int l, unsigned int m) {   // l is in bits
+
+    float e_prob[5], e_freq[5], o_freq[5] = {0};
+    int bin[5];
+
+    if (m == two_power(20)) {
+        bin[0] = 523857;
+        bin[1] = 524158;
+        bin[2] = 524417;
+        bin[3] = 524718;
+        bin[4] = 1048576;
+        e_prob[0] = 0.200224;
+        e_prob[1] = 0.199937;
+        e_prob[2] = 0.199677;
+        e_prob[3] = 0.199937;
+        e_prob[4] = 0.200224;
+    } else {
+        calculate_bins(m, bin, e_prob);
+    }
+
+    int i;
+    for (i = 0; i < 5; i++)
+        e_freq[i] = e_prob[i] * l;
+
 
     uint8_t *key = generate_random_bytes(KEYLEN);
     uint8_t *iv  = generate_random_bytes(IVLEN);
 
     unsigned int *w = calloc(l, sizeof(unsigned int));
 
-    int i, j, k;
+    int j, k;
     for (i = 0; i < m; ++i) {
         uint32_t keystreamlen = l / 8;
 
@@ -176,13 +201,6 @@ double frame_correlation_test(unsigned int l, unsigned int m) {   // l is in bit
     }
 
     // chi-square testing of w
-
-    float e_prob[5], e_freq[5], o_freq[5] = {0};
-    int bin[5];
-
-    calculate_bins(m, bin, e_prob);
-    for (i = 0; i < 5; i++)
-        e_freq[i] = e_prob[i] * l;
 
     for (j = 0; j < l; ++j) {
         k = 0;
