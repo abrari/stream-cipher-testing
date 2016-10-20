@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <memory.h>
 
 #include "matrix.h"
 #include "bytes.h"
@@ -15,7 +16,7 @@
 double linear_span_test(uint8_t key[], int N, int m) {
 
     unsigned int _2m = (1u << m);
-    unsigned int R[N];
+    unsigned int R;
 
     int num_fullrank = 0, num_onelessfullrank = 0, num_lowrank = 0;
     float prob_fullrank, prob_onelessfullrank, prob_lowrank;
@@ -28,14 +29,18 @@ double linear_span_test(uint8_t key[], int N, int m) {
         int ranktest;
 
         // generate random, linearly independent binary vectors
+        byte **alphaTest = malloc(m * sizeof(byte *));
         byte **alpha = malloc(m * sizeof(byte *));
         do {
             for (a = 0; a < m; ++a) {
-                alpha[a] = generate_random_bits(IVLEN_BIT);
+                alphaTest[a] = generate_random_bits(IVLEN_BIT);
+                alpha[a]     = malloc(IVLEN_BIT);
+                memcpy(alpha[a], alphaTest[a], IVLEN_BIT);
             }
-            ranktest = computeRank(m, IVLEN_BIT, alpha);
+            ranktest = computeRank(m, IVLEN_BIT, alphaTest);
             if (ranktest == m) independent = 1;
             else {
+                for (a = 0; a < m; ++a) free(alphaTest[a]);
                 for (a = 0; a < m; ++a) free(alpha[a]);
             }
         }
@@ -75,7 +80,7 @@ double linear_span_test(uint8_t key[], int N, int m) {
         }
 
         // calculate rank of M (or Z)
-        R[i] = computeRank(_2m, _2m, Z);
+        R = computeRank(_2m, _2m, Z);
 
         //    printf("Alpha: \n");
         //    display_matrix(m, IVLEN_BIT, alpha);
@@ -86,12 +91,13 @@ double linear_span_test(uint8_t key[], int N, int m) {
         //    printf("R[%d] = %d\n", i, R[i]);
 
         delete_matrix(m, alpha);
+        delete_matrix(m, alphaTest);
         delete_matrix(_2m, IV);
         delete_matrix(_2m, Z);
 
-        if (R[i] == _2m) num_fullrank++;
-        else if (R[i] == _2m - 1) num_onelessfullrank++;
-        else if (R[i] <= _2m - 2) num_lowrank++;
+        if (R == _2m) num_fullrank++;
+        else if (R == _2m - 1) num_onelessfullrank++;
+        else if (R <= _2m - 2) num_lowrank++;
 
     }
 
@@ -107,6 +113,9 @@ double linear_span_test(uint8_t key[], int N, int m) {
                  + pow((double) num_onelessfullrank - 0.5776 * N, 2) / (0.5776 * N) \
                  + pow((double) num_lowrank - 0.1336 * N, 2) / (0.1336 * N);
     double pval  = exp(-chisq / 2);
+    double pval2 = chi_sq_pval(2, chisq);
+
+    printf("%f\n", fabs(pval - pval2));
 
     // printf("chisq = %lf\n", chisq);
     // printf("p-val = %lf\n", pval);
@@ -120,14 +129,29 @@ double diffusion_test(int N, int L) {
     int bin[5] = {498, 507, 516, 525, 1024}, LB = L>>3;
     float e_freq[5], o_freq[5] = {0};
 
-    if (N != 1024) return -1;
+    if (N == 1024) {
+        // default ^
+    } else if (N == two_power(20)) {
+        bin[0] = 523857;
+        bin[1] = 524158;
+        bin[2] = 524417;
+        bin[3] = 524718;
+        bin[4] = 1048576;
+        e_prob[0] = 0.200224;
+        e_prob[1] = 0.199937;
+        e_prob[2] = 0.199677;
+        e_prob[3] = 0.199937;
+        e_prob[4] = 0.200224;
+    } else {
+        calculate_bins(N, bin, e_prob);
+    }
 
     unsigned i, j, m;
 
     for (i = 0; i < 5; i++)
         e_freq[i] = e_prob[i] * ((KEYLEN_BIT+IVLEN_BIT)*L);
 
-    byte *key, *iv, *keystream1, *keystream2;
+    byte *key, *iv;
     int **M;
     byte *diff_bits = calloc(L, sizeof(uint8_t));
 
