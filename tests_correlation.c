@@ -4,12 +4,7 @@
 
 #include "bytes.h"
 #include "stats.h"
-#include "salsa20/salsa20.h"
-
-#define KEYLEN      16
-#define KEYLEN_BIT  (KEYLEN * 8)
-#define IVLEN       8
-#define IVLEN_BIT   (IVLEN * 8)
+#include "stream_cipher.h"
 
 double key_keystream_correlation_test(uint8_t *IV, int m) {
 
@@ -50,9 +45,8 @@ double key_keystream_correlation_test(uint8_t *IV, int m) {
         unsigned int w;
         uint8_t *key = generate_random_bytes(KEYLEN);
         uint32_t keystreamlen = KEYLEN;
-        uint8_t *keystream = calloc(keystreamlen, sizeof(uint8_t));
+        uint8_t *keystream = generate_keystream(key, IV, 0, keystreamlen);
 
-        s20_crypt(key, S20_KEYLEN_128, IV, 0, keystream, keystreamlen);
         xor_bytes(key, keystream, keystream, KEYLEN);
 
         w = hamming_weight(keystream, KEYLEN);
@@ -123,9 +117,8 @@ double iv_keystream_correlation_test(uint8_t *key, int m) {
         unsigned int w;
         uint8_t *IV = generate_random_bytes(IVLEN);
         uint32_t keystreamlen = IVLEN;
-        uint8_t *keystream = calloc(keystreamlen, sizeof(uint8_t));
+        uint8_t *keystream = generate_keystream(key, IV, 0, keystreamlen);
 
-        s20_crypt(key, S20_KEYLEN_128, IV, 0, keystream, keystreamlen);
         xor_bytes(IV, keystream, keystream, IVLEN);
 
         w = hamming_weight(keystream, IVLEN);
@@ -182,10 +175,9 @@ double frame_correlation_test(unsigned int l, unsigned int m) {   // l is in bit
     for (i = 0; i < m; ++i) {
         uint32_t keystreamlen = l / 8;
 
-        uint8_t *keystream = calloc(keystreamlen, sizeof(uint8_t));
+        uint8_t *keystream = generate_keystream(key, iv, 0, keystreamlen);
         uint8_t *keystream_bit = malloc(l);
 
-        s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream, keystreamlen);
         byte_to_bit_array(keystream, keystreamlen, keystream_bit);
 
         for (j = 0; j < l; ++j) {

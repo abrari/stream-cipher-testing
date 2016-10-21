@@ -1,31 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <stdint.h>
+#include <assert.h>
 
 #include "bytes.h"
 #include "stats.h"
-#include "salsa20/salsa20.h"
+#include "stream_cipher.h"
 
 #include "sfmt/SFMT.h"
 
-#define KEYLEN      16
-#define KEYLEN_BIT  (KEYLEN * 8)
-#define IVLEN       8
-#define IVLEN_BIT   (IVLEN * 8)
+#include "tests_randommapping.h"
 
-void random_bytes(unsigned char *bytes, unsigned int length) {
-    unsigned int i;
-    for (i = 0; i < length; ++i) {
-        bytes[i] = rand() % 256;
-    }
-}
-
-unsigned int find_kzeroes(unsigned int k, uint8_t *bytestream, unsigned int bytestreamlen, unsigned int *numfound) {
-    unsigned int curbyte = 0, curpos = 0, bitstreamlen, zeroes = 0, found = 0;
-    unsigned int numleft = k - *numfound;
+uint32_t find_kzeroes(uint32_t k, uint8_t *bytestream, uint32_t bytestreamlen, uint32_t *numfound) {
+    uint32_t curpos = 0, bitstreamlen, zeroes = 0, found = 0;
+    uint32_t numleft = k - *numfound;
 
     bitstreamlen = bytestreamlen * 8;
 
-    if (numfound) {
+    if (*numfound) {
         while (!isset_bit(bytestream, curpos) && numleft && (curpos < bitstreamlen)) {
             numleft--;
             curpos++;
@@ -45,30 +38,25 @@ unsigned int find_kzeroes(unsigned int k, uint8_t *bytestream, unsigned int byte
 
 
     while (!found && (curpos < bitstreamlen)) {
-        if (isset_bit(bytestream, curpos))
-            zeroes = 0;
-        else
-            zeroes++;
+        if (isset_bit(bytestream, curpos)) zeroes = 0;
+        else zeroes++;
 
-        if (zeroes == k)
-            found = 1;
+        if (zeroes == k) found = 1;
 
         curpos++;
     }
 
     *numfound = zeroes;
 
-    if (found)
-        return curpos;
-    else
-        return 0;
+    if (found) return curpos;
+    else return 0;
 }
 
-double rho_test(uint8_t *key, unsigned int r, unsigned int l) {
+double rho_test(uint8_t *key, uint32_t r, uint32_t l) {
     assert(l == 15 || l == 20);
     float e_prob[5], e_freq[5];;
-    unsigned int bin[5], o_freq[5] = {0};
-    unsigned int i, j, k, mask, temp;
+    uint32_t bin[5], o_freq[5] = {0};
+    uint32_t i, j, k, temp;
 
     switch (l) {
         case 15:
@@ -115,22 +103,18 @@ double rho_test(uint8_t *key, unsigned int r, unsigned int l) {
     }
     //printf("\n");
 
-    uint32_t messagelen = 3;
-    uint8_t message[3] = {0};
-
-
     for (i = 0; i < r; i++) {
         //printf("RUN #%d\n", i);
-        int *cov = calloc(two_power(l), sizeof(int));
-        unsigned int rho = 0, repeated = 0;
+        uint8_t *cov = calloc(two_power(l), sizeof(uint8_t));
+        uint32_t rho = 0, repeated = 0;
 
         uint8_t *iv;
         iv = generate_random_bytes(IVLEN);
 
         do {
             uint32_t keystreamlen = 3;
-            uint8_t *keystream = calloc(keystreamlen, sizeof(uint8_t));
-            s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream, keystreamlen);
+            uint8_t *keystream; // = calloc(keystreamlen, sizeof(uint8_t));
+            keystream = generate_keystream(key, iv, 0, keystreamlen);
             //HC128(key, iv, message, keystream, messagelen);
 
             for (k = 0; k < l; k++) {
@@ -138,7 +122,7 @@ double rho_test(uint8_t *key, unsigned int r, unsigned int l) {
                 else unset_bit(iv, lpos[k]);
             }
 
-            unsigned int kspos;
+            uint32_t kspos;
 
             if (15 == l)
                 kspos = (keystream[0] << 7) + (keystream[1] >> 1);
@@ -175,11 +159,11 @@ double rho_test(uint8_t *key, unsigned int r, unsigned int l) {
     return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 }
 
-double coverage_test(uint8_t *key, unsigned int r, unsigned int l) {
+double coverage_test(uint8_t *key, uint32_t r, uint32_t l) {
     assert(l == 12 || l == 14);
     float e_prob[5], e_freq[5];
-    unsigned int bin[5], o_freq[5] = {0};
-    unsigned int i, j, k, mask, temp;
+    uint32_t bin[5], o_freq[5] = {0};
+    uint32_t i, j, k, mask, temp;
 
     switch (l) {
         case 12:
@@ -214,7 +198,7 @@ double coverage_test(uint8_t *key, unsigned int r, unsigned int l) {
         e_freq[i] = e_prob[i] * r;
 
     uint8_t ivpos[IVLEN_BIT] = {0};
-    int *lpos = calloc(l, sizeof(int));
+    uint32_t *lpos = calloc(l, sizeof(uint32_t));
 
     for (i = 0; i < l; i++) {
         do {
@@ -228,8 +212,8 @@ double coverage_test(uint8_t *key, unsigned int r, unsigned int l) {
 
     for (i = 0; i < r; i++) {
         //printf("RUN #%d\n", i);
-        int *cov = calloc(two_power(l), sizeof(int));
-        unsigned int cov_freq = 0;
+        uint8_t *cov = calloc(two_power(l), sizeof(uint8_t));
+        uint32_t cov_freq = 0;
 
         uint8_t *iv;
         iv = generate_random_bytes(IVLEN);
@@ -248,10 +232,10 @@ double coverage_test(uint8_t *key, unsigned int r, unsigned int l) {
             //printf("\n");
             //getch();
             uint32_t keystreamlen = 2;
-            uint8_t keystream[2] = {0}; //calloc(keystreamlen, sizeof(uint8_t));
-            s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream, keystreamlen);
+            uint8_t *keystream; //calloc(keystreamlen, sizeof(uint8_t));
+            keystream = generate_keystream(key, iv, 0, keystreamlen);
 
-            unsigned int kspos;
+            uint32_t kspos;
             kspos = (keystream[0] << (l - 8)) + (keystream[1] >> (16 - l));
             //print_bytes(keystream, keystreamlen);
             //printf("\n");
@@ -272,19 +256,19 @@ double coverage_test(uint8_t *key, unsigned int r, unsigned int l) {
         free(cov);
     }
 
-    for(i=0; i<5; i++)
-        printf("%d\t%f\t%d\n", i, e_freq[i], o_freq[i]);
+//    for(i=0; i<5; i++)
+//        printf("%d\t%f\t%d\n", i, e_freq[i], o_freq[i]);
 
     free(lpos);
 
     return chi_sq_pval(4, chi_sq(5, o_freq, e_freq));
 }
 
-double dpcoverage_test(uint8_t *key, unsigned int r, unsigned int l, unsigned int k) {
+double dpcoverage_test(uint8_t *key, uint32_t r, uint32_t l, uint32_t k) {
     assert(l == 12 || l == 14);
     float e_prob[5], e_freq[5];
-    unsigned int bin[5], o_freq[5] = {0};
-    unsigned int i, j, m, mask, temp;
+    uint32_t bin[5], o_freq[5] = {0};
+    uint32_t i, j, m, mask, temp;
 
     switch (l) {
         case 12:
@@ -351,42 +335,47 @@ double dpcoverage_test(uint8_t *key, unsigned int r, unsigned int l, unsigned in
 
             uint32_t keystreamlen = 1000, prevkeystreamlen = 0;
             uint8_t *keystream = NULL;
-            unsigned int startlpos, numfound = 0;
+            uint32_t startlpos, numfound = 0;
 
             do {
                 if (keystream) free(keystream);
-                keystream = calloc(keystreamlen, sizeof(uint8_t));
-                s20_crypt(key, S20_KEYLEN_128, iv, prevkeystreamlen, keystream, keystreamlen);
+                keystream = generate_keystream(key, iv, prevkeystreamlen, keystreamlen);
                 startlpos = find_kzeroes(k, keystream, keystreamlen, &numfound);
                 prevkeystreamlen += keystreamlen;
             } while (!startlpos);
 
-            // Belum menangani kasus sisa bit di keystream kurang dari l
-
-            unsigned int p, q;
+            uint32_t p, q;
             p = startlpos / 8;
             q = startlpos % 8;
 
-            unsigned int kspos;
+            uint32_t kspos;
 
             if (startlpos == keystreamlen * 8) {
                 free(keystream);
-                keystream = calloc(keystreamlen, 2);
-                s20_crypt(key, S20_KEYLEN_128, iv, prevkeystreamlen, keystream, 2);
+                keystream = generate_keystream(key, iv, prevkeystreamlen, 2);
 
                 kspos = (keystream[0] << (l - 8 + q)) + (keystream[1] >> (16 - l - q));
             }
             else if ((startlpos + l) > (keystreamlen * 8)) {
-                kspos = keystream[p] << (l - 8 + q);
 
-                free(keystream);
-                keystream = calloc(keystreamlen, 2);
-                s20_crypt(key, S20_KEYLEN_128, iv, prevkeystreamlen, keystream, 2);
+                if (p == (keystreamlen-1)) {
+                    kspos = keystream[p] << (l - 8 + q);
 
-                if ((l + q) <= 16)
-                    kspos = (keystream[0] >> (16 - l - q));
-                else
-                    kspos = (keystream[0] << (l + q - 16)) + (keystream[1] >> (24 - l - q));
+                    free(keystream);
+                    keystream = generate_keystream(key, iv, prevkeystreamlen, 2);
+
+                    if ((l + q) <= 16)
+                        kspos += (keystream[0] >> (16 - l - q));
+                    else
+                        kspos += (keystream[0] << (l + q - 16)) + (keystream[1] >> (24 - l - q));
+                }
+                else {
+                    kspos = (keystream[p] << (l - 8 + q)) + (keystream[p+1] << (l + q - 16));
+
+                    free(keystream);
+                    keystream = generate_keystream(key, iv, prevkeystreamlen, 1);
+                    kspos += (keystream[0] >> (24 - l - q));
+                }
             }
             else {
                 if ((l + q) <= 16)
@@ -394,8 +383,10 @@ double dpcoverage_test(uint8_t *key, unsigned int r, unsigned int l, unsigned in
                 else
                     kspos = (keystream[p] << (l - 8 + q)) + (keystream[p + 1] << (l + q - 16)) +
                             (keystream[p + 2] >> (24 - l - q));
-
             }
+
+            //printf("%u\t%u\n", startlpos, kspos);
+
             //print_bytes(keystream, keystreamlen);
             //printf("\n");
             //printf("%d\n", kspos);

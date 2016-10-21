@@ -8,10 +8,7 @@
 #include "stats.h"
 #include "salsa20/salsa20.h"
 
-#define KEYLEN      16
-#define KEYLEN_BIT  (KEYLEN * 8)
-#define IVLEN       8
-#define IVLEN_BIT   (IVLEN * 8)
+#include "stream_cipher.h"
 
 double linear_span_test(uint8_t key[], int N, int m) {
 
@@ -70,7 +67,7 @@ double linear_span_test(uint8_t key[], int N, int m) {
             keystream_byte = calloc(keystream_byte_len, sizeof(uint8_t));
 
             bit_to_byte_array(IV[j], IVLEN_BIT, IV_byte);
-            s20_crypt(key, S20_KEYLEN_128, IV_byte, 0, keystream_byte, keystream_byte_len);
+            keystream_byte = generate_keystream(key, IV_byte, 0, keystream_byte_len);
 
             Z[j] = malloc(_2m);
             byte_to_bit_array(keystream_byte, keystream_byte_len, Z[j]);
@@ -161,7 +158,7 @@ double diffusion_test(int N, int L) {
         iv = generate_random_bytes(IVLEN);
 
         uint8_t *keystream1 = calloc(LB, sizeof(uint8_t));
-        s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream1, LB);
+        keystream1 = generate_keystream(key, iv, 0, LB);
 
         for(j=0; j<(KEYLEN_BIT+IVLEN_BIT); j++) {
 
@@ -174,7 +171,7 @@ double diffusion_test(int N, int L) {
             }
 
             uint8_t *keystream2 = calloc(LB, sizeof(uint8_t));
-            s20_crypt(key, S20_KEYLEN_128, iv, 0, keystream2, LB);
+            keystream2 = generate_keystream(key, iv, 0, LB);
 
             uint8_t *diff = calloc(LB, sizeof(uint8_t));
             xor_bytes(keystream1, keystream2, diff, LB);
