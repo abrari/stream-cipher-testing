@@ -154,7 +154,6 @@ double diffusion_test(int N, int L) {
     byte *key, *iv;
     int **M;
     byte *diff_bits = calloc(L, sizeof(uint8_t));
-
     M = create_integer_matrix(KEYLEN_BIT+IVLEN_BIT, L);
 
     for(i=0; i<N; i++) {
@@ -214,6 +213,9 @@ double diffusion_test(int N, int L) {
         }
 
     }
+
+    free(diff_bits);
+    delete_matrix(KEYLEN_BIT+IVLEN_BIT, M);
 
     // for (i = 0; i < 5; i++)
     //    printf("%d\t%f\t%f\n", i, e_freq[i], o_freq[i]);
