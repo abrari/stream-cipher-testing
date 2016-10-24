@@ -1,10 +1,11 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "stats.h"
 
-double chi_sq(int n, float observed[], float expected[]) {
+double chi_sq(int n, uint32_t observed[], float expected[]) {
     double cs = 0;
     int i;
     for (i = 0; i < n; i++) {

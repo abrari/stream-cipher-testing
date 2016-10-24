@@ -19,8 +19,23 @@
 
 sfmt_t mtrand;
 
-#include "matrix.h"
-#define IVLEN_BIT 64
+void test_gen_keystream(uint8_t *key, uint8_t *iv) {
+    printf("Keystream dengan algoritme %s:\n", ALGONAME);
+
+    uint8_t *keystream;
+    uint32_t keystreamlen = 16;
+    uint8_t message[16] = {0};
+    keystream = generate_keystream(key, iv, 0, keystreamlen);
+    puts("index 0");
+    print_bytes(keystream, keystreamlen);
+    puts("");
+    free(keystream);
+    keystream = generate_keystream(key, iv, 1, keystreamlen);
+    puts("index 1");
+    print_bytes(keystream, keystreamlen);
+    puts("");
+    free(keystream);
+}
 
 int main() {
 
@@ -39,8 +54,26 @@ int main() {
     double *cov_p_vals, total_cov_p_vals = 0;
     cov_p_vals = (double*) malloc(sizeof(double)*num_p_vals);
 
+/*
+
+algebraic tests:
+    double linear_span_test(uint8_t *key, int N, int m);
+    double diffusion_test(int N, int L);
+
+correlation tests:
+    double key_keystream_correlation_test(uint8_t *IV, int m);
+    double iv_keystream_correlation_test(uint8_t *key, int m);
+    double frame_correlation_test(unsigned int l, unsigned int m);
+
+randommapping tests:
+    double rho_test(uint8_t *key, uint32_t r, uint32_t l);
+    double coverage_test(uint8_t *key, uint32_t r, uint32_t l);
+    double dpcoverage_test(uint8_t *key, uint32_t r, uint32_t l, uint32_t k);
+
+*/
+
     for(i=0; i<num_p_vals; i++) {
-        cov_p_vals[i] = diffusion_test(two_power(10), 256);
+        cov_p_vals[i] = coverage_test(key, 100, 12);
         total_cov_p_vals += cov_p_vals[i];
         printf("%d: P-Val = %f\n", i+1, cov_p_vals[i]);
     }
@@ -54,29 +87,7 @@ int main() {
     double cs = chi_sq_uniform(cov_p_vals, num_p_vals, 5);
     printf("ChiSq test P-Val = %f\n", cs);
 
-
-//    uint32_t num_p_vals = 1, i;
-//    uint8_t key[KEYLEN] = {0};
-//    uint8_t *keybits = malloc(KEYLEN_BIT);
-//
-//    printf("Menggunakan algoritme %s\n", ALGONAME);
-//
-//    //byte_to_bit_array(key, KEYLEN, keybits);
-//
-//    uint8_t iv[IVLEN] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
-//
-//    uint8_t *keystream;
-//    uint32_t keystreamlen = 16;
-//    uint8_t message[16] = {0};
-//    keystream = generate_keystream(key, iv, 0, keystreamlen);
-//    print_bytes(keystream, keystreamlen);
-//    puts("");
-//    free(keystream);
-//    keystream = generate_keystream(key, iv, 1, keystreamlen);
-//    print_bytes(keystream, keystreamlen);
-//    puts("");
-//    free(keystream);
-
+    // test_gen_keystream(key, iv);
 
     return 0;
 }

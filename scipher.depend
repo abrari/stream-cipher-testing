@@ -1,0 +1,207 @@
+# depslib dependency file v1.0
+1476688353 source:/tmp/scipher/bytes.c
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+	"bytes.h"
+
+1476679302 /tmp/scipher/bytes.h
+	"sfmt/SFMT.h"
+
+1387431064 /tmp/scipher/sfmt/SFMT.h
+	<stdio.h>
+	<assert.h>
+	<inttypes.h>
+	<inttypes.h>
+	"SFMT-params.h"
+	<altivec.h>
+	<emmintrin.h>
+
+1476685292 /tmp/scipher/sfmt/SFMT-params.h
+	"SFMT-params607.h"
+	"SFMT-params1279.h"
+	"SFMT-params2281.h"
+	"SFMT-params4253.h"
+	"SFMT-params11213.h"
+	"SFMT-params19937.h"
+	"SFMT-params44497.h"
+	"SFMT-params86243.h"
+	"SFMT-params132049.h"
+	"SFMT-params216091.h"
+
+1387431064 /tmp/scipher/sfmt/SFMT-params607.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params1279.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params2281.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params4253.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params11213.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params19937.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params44497.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params86243.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params132049.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-params216091.h
+
+1477034582 source:/tmp/scipher/grain128/grain128.c
+	"../stream_cipher.h"
+	"ecrypt-sync.h"
+
+1477037567 /tmp/scipher/stream_cipher.h
+	<stdint.h>
+	<stdlib.h>
+	"salsa20/salsa20.h"
+	"hc128/hc128_opt32.h"
+	"grain128/ecrypt-sync.h"
+	"mickey/ecrypt-sync.h"
+
+1475206803 /tmp/scipher/salsa20/salsa20.h
+	<stdint.h>
+	<stddef.h>
+
+1476805407 /tmp/scipher/hc128/hc128_opt32.h
+	<string.h>
+
+1151503346 /tmp/scipher/grain128/ecrypt-sync.h
+	"ecrypt-portable.h"
+
+1112790044 /tmp/scipher/grain128/ecrypt-portable.h
+	"ecrypt-config.h"
+	"ecrypt-machine.h"
+	"ecrypt-machine.h"
+	"ecrypt-machine.h"
+	"ecrypt-machine.h"
+
+1111408650 /tmp/scipher/grain128/ecrypt-config.h
+	<limits.h>
+
+1111408652 /tmp/scipher/grain128/ecrypt-machine.h
+	<stdlib.h>
+
+1151453384 /tmp/scipher/mickey/ecrypt-sync.h
+	"ecrypt-portable.h"
+
+1113802080 /tmp/scipher/mickey/ecrypt-portable.h
+	"ecrypt-config.h"
+	"ecrypt-machine.h"
+	"ecrypt-machine.h"
+	"ecrypt-machine.h"
+	"ecrypt-machine.h"
+
+1113802080 /tmp/scipher/mickey/ecrypt-config.h
+	<limits.h>
+
+1113802080 /tmp/scipher/mickey/ecrypt-machine.h
+	<stdlib.h>
+
+1476806673 source:/tmp/scipher/hc128/hc128_opt32.c
+	"hc128_opt32.h"
+
+1477352359 source:/tmp/scipher/main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdint.h>
+	<memory.h>
+	"stream_cipher.h"
+	"tests_algebraic.h"
+	"tests_randommapping.h"
+	"tests_correlation.h"
+	"bytes.h"
+	"stats.h"
+	"sfmt/SFMT.h"
+
+1475833318 /tmp/scipher/tests_algebraic.h
+	<stdint.h>
+
+1477037873 /tmp/scipher/tests_randommapping.h
+	<stdint.h>
+
+1475769511 /tmp/scipher/tests_correlation.h
+	<stdint.h>
+
+1477352535 /tmp/scipher/stats.h
+	<stdint.h>
+
+1475759953 /tmp/scipher/matrix.h
+
+1475769626 source:/tmp/scipher/matrix.c
+	<stdio.h>
+	<stdlib.h>
+	"matrix.h"
+
+1477035829 source:/tmp/scipher/mickey/mickey2.c
+	"../stream_cipher.h"
+	"ecrypt-sync.h"
+
+1475387350 source:/tmp/scipher/salsa20/salsa20.c
+	<stdint.h>
+	<stddef.h>
+	"salsa20.h"
+
+1477352540 source:/tmp/scipher/stats.c
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	"stats.h"
+
+1477037292 source:/tmp/scipher/stream_cipher.c
+	"stream_cipher.h"
+
+1477038014 source:/tmp/scipher/tests_algebraic.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<memory.h>
+	"matrix.h"
+	"bytes.h"
+	"stats.h"
+	"salsa20/salsa20.h"
+	"stream_cipher.h"
+
+1477038122 source:/tmp/scipher/tests_correlation.c
+	<stdint.h>
+	<stdio.h>
+	<stdlib.h>
+	"bytes.h"
+	"stats.h"
+	"stream_cipher.h"
+
+1477352461 source:/tmp/scipher/tests_randommapping.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<stdint.h>
+	<assert.h>
+	"bytes.h"
+	"stats.h"
+	"stream_cipher.h"
+	"sfmt/SFMT.h"
+	"tests_randommapping.h"
+
+1387431064 source:/tmp/scipher/sfmt/SFMT.c
+	<string.h>
+	<assert.h>
+	"SFMT.h"
+	"SFMT-params.h"
+	"SFMT-common.h"
+	"SFMT-alti.h"
+	"SFMT-sse2-msc.h"
+	"SFMT-sse2.h"
+
+1387431064 /tmp/scipher/sfmt/SFMT-common.h
+	"SFMT.h"
+
+1387431064 /tmp/scipher/sfmt/SFMT-alti.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-sse2-msc.h
+
+1387431064 /tmp/scipher/sfmt/SFMT-sse2.h
+
